@@ -1,0 +1,11 @@
+node_modules
+.next
+.env*.local
+data/originals/*
+data/hls/*
+data/thumbnails/*
+data/video.db
+data/video.db-*
+!data/originals/.keep
+!data/hls/.keep
+!data/thumbnails/.keep
