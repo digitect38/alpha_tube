@@ -7,12 +7,12 @@ export default function AdminImport() {
   const [result, setResult] = useState<{ ok: boolean; stdout?: string; stderr?: string; error?: string } | null>(null);
 
   useEffect(() => {
-    fetch('/apps/video/api/admin/import').then(r => r.json()).then(setSrc);
+    fetch('/apps/video_stream/api/admin/import').then(r => r.json()).then(setSrc);
   }, []);
 
   const run = async () => {
     setRunning(true); setResult(null);
-    const r = await fetch('/apps/video/api/admin/import', { method: 'POST' });
+    const r = await fetch('/apps/video_stream/api/admin/import', { method: 'POST' });
     const d = await r.json().catch(() => ({ ok: false, error: 'bad response' }));
     setResult(d);
     setRunning(false);

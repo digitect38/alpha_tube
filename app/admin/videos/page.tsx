@@ -34,7 +34,7 @@ export default function AdminVideos() {
   const [err, setErr] = useState<string | null>(null);
 
   const load = () =>
-    fetch('/apps/video/api/admin/videos')
+    fetch('/apps/video_stream/api/admin/videos')
       .then(r => r.json())
       .then(d => setRows(d.videos ?? []));
 
@@ -43,7 +43,7 @@ export default function AdminVideos() {
   const del = async (id: string, title: string) => {
     if (!confirm(`Delete "${title}"? This removes the video, comments, likes, HLS variants, and thumbnail. The original source file is kept if it lives outside the app data dir.`)) return;
     setBusy(id); setErr(null);
-    const r = await fetch(`/apps/video/api/admin/videos/${id}`, { method: 'DELETE' });
+    const r = await fetch(`/apps/video_stream/api/admin/videos/${id}`, { method: 'DELETE' });
     setBusy(null);
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
@@ -75,7 +75,7 @@ export default function AdminVideos() {
             {rows.map(r => (
               <tr key={r.id} className="border-b border-neutral-900 hover:bg-neutral-950">
                 <td className="py-2 pr-3">
-                  <a href={`/apps/video/watch/${r.id}`} className="hover:underline">{r.title}</a>
+                  <a href={`/apps/video_stream/watch/${r.id}`} className="hover:underline">{r.title}</a>
                   <div className="text-xs text-neutral-600 font-mono">{r.id}</div>
                 </td>
                 <td className="py-2 pr-3 text-neutral-400">@{r.authorHandle}</td>

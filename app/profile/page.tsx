@@ -14,7 +14,7 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetch('/apps/video/api/profile')
+    fetch('/apps/video_stream/api/profile')
       .then(async r => {
         if (r.status === 401) { setAuthed(false); setLoaded(true); return; }
         const d = await r.json();
@@ -37,7 +37,7 @@ export default function Profile() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true); setErr(null); setSaved(false);
-    const r = await fetch('/apps/video/api/profile', {
+    const r = await fetch('/apps/video_stream/api/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ displayName, handle, bio }),

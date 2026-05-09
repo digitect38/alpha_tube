@@ -20,7 +20,7 @@ export function ShareButton({
     const origin = publicOrigin && /^https?:\/\//.test(publicOrigin)
       ? publicOrigin.replace(/\/$/, '')
       : window.location.origin;
-    const url = `${origin}/apps/video/watch/${videoId}`;
+    const url = `${origin}/apps/video_stream/watch/${videoId}`;
 
     // Prefer the OS share sheet on mobile / supported browsers.
     if (navigator.share) {

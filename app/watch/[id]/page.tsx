@@ -27,9 +27,9 @@ export default async function Watch({ params }: { params: { id: string } }) {
   }
 
   const playbackSrc = v.hlsMaster
-    ? `/apps/video/api/stream/${v.id}/master.m3u8`
-    : `/apps/video/api/file/${v.id}`;
-  const poster = v.thumbnail ? `/apps/video/api/thumbnail/${v.thumbnail}` : null;
+    ? `/apps/video_stream/api/stream/${v.id}/master.m3u8`
+    : `/apps/video_stream/api/file/${v.id}`;
+  const poster = v.thumbnail ? `/apps/video_stream/api/thumbnail/${v.thumbnail}` : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">

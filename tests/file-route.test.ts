@@ -36,7 +36,7 @@ function makeFile(size: number): string {
 function callGET(id: string, range?: string) {
   const headers: Record<string, string> = {};
   if (range) headers.Range = range;
-  const req = new Request(`http://localhost/apps/video/api/file/${id}`, { headers });
+  const req = new Request(`http://localhost/apps/video_stream/api/file/${id}`, { headers });
   return GET(req as any, { params: { id } });
 }
 

@@ -24,7 +24,7 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false;
 
-    fetch('/apps/video/api/auth/me')
+    fetch('/apps/video_stream/api/auth/me')
       .then(r => r.json())
       .then(d => {
         if (!cancelled) setState({ loaded: true, viewer: d.user ?? null });
