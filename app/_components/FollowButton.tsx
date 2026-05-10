@@ -24,7 +24,7 @@ export function FollowButton({ handle, initialFollowing, initialFollowers, authe
     if (!authed) { window.location.href = '/'; return; }
     if (busy) return;
     setBusy(true);
-    const r = await fetch(`/apps/video_stream/api/channel/${handle}/follow`, {
+    const r = await fetch(`/apps/alpha_tube/api/channel/${handle}/follow`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'toggle' }),

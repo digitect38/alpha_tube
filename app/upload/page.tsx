@@ -17,7 +17,7 @@ export default function Upload() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/apps/video_stream/api/auth/me')
+    fetch('/apps/alpha_tube/api/auth/me')
       .then(r => r.json())
       .then(d => setAuthed(!!d.user));
   }, []);
@@ -46,7 +46,7 @@ export default function Upload() {
     setProgress(0);
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/apps/video_stream/api/upload');
+    xhr.open('POST', '/apps/alpha_tube/api/upload');
     xhr.upload.onprogress = ev => {
       if (ev.lengthComputable) setProgress(Math.round((ev.loaded / ev.total) * 100));
     };

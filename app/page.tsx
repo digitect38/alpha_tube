@@ -17,7 +17,7 @@ export default async function Home({ searchParams }: { searchParams: { c?: strin
           return (
             <a
               key={c}
-              href={c === 'All' ? '/apps/video_stream/' : `/apps/video_stream/?c=${encodeURIComponent(c)}`}
+              href={c === 'All' ? '/apps/alpha_tube/' : `/apps/alpha_tube/?c=${encodeURIComponent(c)}`}
               className={
                 'px-3 py-1 rounded-full text-sm whitespace-nowrap ' +
                 (active ? 'bg-white text-black' : 'bg-neutral-800 hover:bg-neutral-700')

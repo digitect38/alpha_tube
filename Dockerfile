@@ -41,4 +41,4 @@ USER app
 EXPOSE 3010
 ENV PORT=3010
 ENV DATA_DIR=/app/data
-CMD ["npm", "start"]
+CMD ["sh", "-c", "node scripts/auto-import-watcher.mjs & exec npm start"]

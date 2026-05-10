@@ -16,7 +16,7 @@ export function Comments({ videoId }: { videoId: string }) {
   const [busy, setBusy] = useState(false);
 
   const load = () => {
-    fetch(`/apps/video_stream/api/videos/${videoId}/comments`)
+    fetch(`/apps/alpha_tube/api/videos/${videoId}/comments`)
       .then(r => r.json())
       .then(d => setItems(d.comments));
   };
@@ -27,7 +27,7 @@ export function Comments({ videoId }: { videoId: string }) {
     e.preventDefault();
     if (!body.trim()) return;
     setBusy(true);
-    const r = await fetch(`/apps/video_stream/api/videos/${videoId}/comments`, {
+    const r = await fetch(`/apps/alpha_tube/api/videos/${videoId}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ body }),
@@ -62,7 +62,7 @@ export function Comments({ videoId }: { videoId: string }) {
         {items.map(c => (
           <li key={c.id}>
             <div className="text-sm">
-              <a href={`/apps/video_stream/channel/${c.author.handle}`} className="font-medium hover:underline">
+              <a href={`/apps/alpha_tube/channel/${c.author.handle}`} className="font-medium hover:underline">
                 {c.author.displayName}
               </a>
               <span className="text-neutral-500 ml-2">{new Date(c.createdAt).toLocaleDateString()}</span>

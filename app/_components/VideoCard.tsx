@@ -34,7 +34,7 @@ export function VideoCard({ v }: { v: VideoCardData }) {
         {v.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`/apps/video_stream/api/thumbnail/${v.thumbnail}`}
+            src={`/apps/alpha_tube/api/thumbnail/${v.thumbnail}`}
             alt={v.title}
             className="w-full h-full object-cover group-hover:scale-[1.02] transition"
           />

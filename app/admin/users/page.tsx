@@ -18,13 +18,13 @@ export default function AdminUsers() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/apps/video_stream/api/auth/me').then(r => r.json()).then(d => setMeId(d.user?.id ?? null));
-    fetch('/apps/video_stream/api/admin/users').then(r => r.json()).then(d => setRows(d.users ?? []));
+    fetch('/apps/alpha_tube/api/auth/me').then(r => r.json()).then(d => setMeId(d.user?.id ?? null));
+    fetch('/apps/alpha_tube/api/admin/users').then(r => r.json()).then(d => setRows(d.users ?? []));
   }, []);
 
   const toggle = async (u: Row) => {
     setBusy(u.id); setErr(null);
-    const r = await fetch('/apps/video_stream/api/admin/users', {
+    const r = await fetch('/apps/alpha_tube/api/admin/users', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: u.id, isAdmin: !u.isAdmin }),

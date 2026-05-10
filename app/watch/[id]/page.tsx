@@ -27,9 +27,9 @@ export default async function Watch({ params }: { params: { id: string } }) {
   }
 
   const playbackSrc = v.hlsMaster
-    ? `/apps/video_stream/api/stream/${v.id}/master.m3u8`
-    : `/apps/video_stream/api/file/${v.id}`;
-  const poster = v.thumbnail ? `/apps/video_stream/api/thumbnail/${v.thumbnail}` : null;
+    ? `/apps/alpha_tube/api/stream/${v.id}/master.m3u8`
+    : `/apps/alpha_tube/api/file/${v.id}`;
+  const poster = v.thumbnail ? `/apps/alpha_tube/api/thumbnail/${v.thumbnail}` : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">

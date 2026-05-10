@@ -7,6 +7,7 @@ import { ViewerProvider } from './_components/ViewerProvider';
 export const metadata: Metadata = {
   title: 'Alpha Tube',
   description: 'Self-hosted video streaming portal',
+  icons: { icon: '/AlphaTube_logo.png' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

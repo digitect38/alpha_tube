@@ -20,7 +20,7 @@ export function LikeButton({
     if (!loaded || !viewer) return;
 
     let cancelled = false;
-    fetch(`/apps/video_stream/api/videos/${videoId}/like`)
+    fetch(`/apps/alpha_tube/api/videos/${videoId}/like`)
       .then(r => r.json())
       .then(d => {
         if (!cancelled && typeof d.liked === 'boolean') setLiked(d.liked);
@@ -36,7 +36,7 @@ export function LikeButton({
     if (!viewer) return;
     if (busy) return;
     setBusy(true);
-    const r = await fetch(`/apps/video_stream/api/videos/${videoId}/like`, { method: 'POST' });
+    const r = await fetch(`/apps/alpha_tube/api/videos/${videoId}/like`, { method: 'POST' });
     if (r.ok) {
       const d = await r.json();
       setLiked(d.liked);
