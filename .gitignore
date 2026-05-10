@@ -6,6 +6,7 @@ data/hls/*
 data/thumbnails/*
 data/video.db
 data/video.db-*
+data/visibility.yml
 !data/originals/.keep
 !data/hls/.keep
 !data/thumbnails/.keep

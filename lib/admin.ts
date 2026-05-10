@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getDb, paths } from './db';
+import { classifyHidden } from './visibility';
 
 export type AdminVideoRow = {
   id: string;
@@ -13,13 +14,16 @@ export type AdminVideoRow = {
   authorHandle: string;
   hasMp4: boolean;
   hasHls: boolean;
+  originalPath: string;
+  sourceDir: string;
+  hidden: 'no' | 'by_id' | 'by_pattern';
 };
 
 export function listAllVideos(): AdminVideoRow[] {
   return (getDb()
     .prepare(
       `SELECT v.id, v.title, v.category, v.status, v.duration, v.view_count, v.created_at,
-              v.mp4_path, v.hls_master, u.handle
+              v.mp4_path, v.hls_master, v.original_path, u.handle
        FROM videos v JOIN users u ON u.id = v.user_id
        ORDER BY v.created_at DESC`,
     )
@@ -34,6 +38,9 @@ export function listAllVideos(): AdminVideoRow[] {
     authorHandle: r.handle,
     hasMp4: !!r.mp4_path,
     hasHls: !!r.hls_master,
+    originalPath: r.original_path,
+    sourceDir: path.dirname(r.original_path),
+    hidden: classifyHidden(r.id, r.original_path),
   }));
 }
 

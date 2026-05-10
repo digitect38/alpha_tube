@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'node:fs';
 import path from 'node:path';
 import { paths } from '@/lib/db';
+import { isVideoHidden } from '@/lib/visibility';
 
 export const runtime = 'nodejs';
 
@@ -19,6 +20,7 @@ export async function GET(
 ) {
   const id = params.id;
   if (!/^[a-f0-9]{16}$/.test(id)) return NextResponse.json({ error: 'bad id' }, { status: 400 });
+  if (isVideoHidden(id)) return NextResponse.json({ error: 'not found' }, { status: 404 });
 
   const rel = params.path.join('/');
   const abs = path.normalize(path.join(paths.hls, id, rel));

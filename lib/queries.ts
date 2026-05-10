@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
-import { unstable_cache } from 'next/cache';
 import { getDb } from './db';
+import { isHidden } from './visibility';
 
 export type VideoCard = {
   id: string;
@@ -21,14 +21,19 @@ export type VideoCard = {
 
 const VIDEO_FIELDS = `
   v.id, v.title, v.description, v.category, v.tags, v.status, v.duration,
-  v.thumbnail, v.hls_master, v.mp4_path, v.view_count, v.created_at,
+  v.thumbnail, v.hls_master, v.mp4_path, v.original_path, v.view_count, v.created_at,
   u.handle AS author_handle, u.display_name AS author_name,
   (SELECT COUNT(*) FROM likes l WHERE l.video_id = v.id) AS like_count
 `;
 
+// Drop rows the visibility.yml says to hide. Done after the SQL fetch so the
+// rule can match on either id or original_path with one round-trip.
+function visibleOnly(rows: any[]): any[] {
+  return rows.filter((r) => !isHidden(r.id, r.original_path));
+}
+
 const statementCache = new Map<string, Database.Statement>();
 let cachedDb: Database.Database | null = null;
-const PUBLIC_REVALIDATE_SECONDS = 15;
 
 function prepared(sql: string): Database.Statement {
   const db = getDb();
@@ -114,74 +119,48 @@ function listVideosRaw(category: string | undefined, limit: number, offset: numb
   const rows = category
     ? prepared(LIST_VIDEOS_BY_CATEGORY_SQL).all(category, limit, offset)
     : prepared(LIST_VIDEOS_SQL).all(limit, offset);
-  return (rows as any[]).map(rowToCard);
+  return visibleOnly(rows as any[]).map(rowToCard);
 }
-
-const listVideosCached = unstable_cache(
-  async (category: string | null, limit: number, offset: number) =>
-    listVideosRaw(category ?? undefined, limit, offset),
-  ['public-videos'],
-  { revalidate: PUBLIC_REVALIDATE_SECONDS },
-);
 
 export async function listVideos(
   opts: { category?: string; limit?: number; offset?: number } = {},
 ): Promise<VideoCard[]> {
   const limit = Math.min(opts.limit ?? 24, 100);
   const offset = opts.offset ?? 0;
-  return listVideosCached(opts.category ?? null, limit, offset);
+  return listVideosRaw(opts.category, limit, offset);
 }
 
 function getVideoRaw(id: string): VideoCard | null {
   const r = prepared(GET_VIDEO_SQL).get(id) as any;
-  return r ? rowToCard(r) : null;
+  if (!r || isHidden(r.id, r.original_path)) return null;
+  return rowToCard(r);
 }
 
-const getVideoCached = unstable_cache(
-  async (id: string) => getVideoRaw(id),
-  ['public-video'],
-  { revalidate: PUBLIC_REVALIDATE_SECONDS },
-);
-
 export async function getVideo(id: string): Promise<VideoCard | null> {
-  return getVideoCached(id);
+  return getVideoRaw(id);
 }
 
 function listChannelVideosRaw(handle: string, limit: number): VideoCard[] {
-  return (prepared(LIST_CHANNEL_VIDEOS_SQL).all(handle, limit) as any[]).map(rowToCard);
+  return visibleOnly(prepared(LIST_CHANNEL_VIDEOS_SQL).all(handle, limit) as any[]).map(rowToCard);
 }
 
-const listChannelVideosCached = unstable_cache(
-  async (handle: string, limit: number) => listChannelVideosRaw(handle, limit),
-  ['public-channel-videos'],
-  { revalidate: PUBLIC_REVALIDATE_SECONDS },
-);
-
 export async function listChannelVideos(handle: string, limit = 48): Promise<VideoCard[]> {
-  return listChannelVideosCached(handle, limit);
+  return listChannelVideosRaw(handle, limit);
 }
 
 function searchVideosRaw(fts: string, limit: number): VideoCard[] {
-  return (prepared(SEARCH_VIDEOS_SQL).all(fts, limit) as any[]).map(rowToCard);
+  return visibleOnly(prepared(SEARCH_VIDEOS_SQL).all(fts, limit) as any[]).map(rowToCard);
 }
-
-const searchVideosCached = unstable_cache(
-  async (fts: string, limit: number) => {
-    try {
-      return searchVideosRaw(fts, limit);
-    } catch {
-      return [];
-    }
-  },
-  ['public-search-videos'],
-  { revalidate: PUBLIC_REVALIDATE_SECONDS },
-);
 
 export async function searchVideos(q: string, limit = 30): Promise<VideoCard[]> {
   const term = q.replace(/['"]/g, ' ').trim();
   if (!term) return [];
   const fts = term.split(/\s+/).map(t => `${t}*`).join(' ');
-  return searchVideosCached(fts, limit);
+  try {
+    return searchVideosRaw(fts, limit);
+  } catch {
+    return [];
+  }
 }
 
 export function incrementView(id: string) {
@@ -254,14 +233,8 @@ function getUserByHandleRaw(handle: string) {
     | undefined;
 }
 
-const getUserByHandleCached = unstable_cache(
-  async (handle: string) => getUserByHandleRaw(handle),
-  ['public-channel-user'],
-  { revalidate: PUBLIC_REVALIDATE_SECONDS },
-);
-
 export async function getUserByHandle(handle: string) {
-  return getUserByHandleCached(handle);
+  return getUserByHandleRaw(handle);
 }
 
 export type UpdateProfileError = 'handle_taken' | 'invalid_handle' | 'invalid_name';
@@ -339,5 +312,5 @@ const SUBS_FEED_SQL = `
 // keep this fast even with thousands of follows.
 export function listSubscriptionVideos(followerId: number, limit = 48): VideoCard[] {
   const rows = prepared(SUBS_FEED_SQL).all(followerId, Math.min(limit, 100)) as any[];
-  return rows.map(rowToCard);
+  return visibleOnly(rows).map(rowToCard);
 }

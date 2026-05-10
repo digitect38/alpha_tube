@@ -17,6 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/videos" className="block px-3 py-1.5 rounded hover:bg-neutral-900">Videos</Link>
           <Link href="/admin/users"  className="block px-3 py-1.5 rounded hover:bg-neutral-900">Users</Link>
           <Link href="/admin/import" className="block px-3 py-1.5 rounded hover:bg-neutral-900">Import</Link>
+          <Link href="/admin/visibility" className="block px-3 py-1.5 rounded hover:bg-neutral-900">Visibility</Link>
         </nav>
         <div className="text-xs text-neutral-500 mt-6">Signed in as <span className="text-neutral-300">@{me.handle}</span></div>
       </aside>

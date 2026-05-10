@@ -1,7 +1,7 @@
 import { searchVideos } from '@/lib/queries';
 import { VideoCard } from '@/app/_components/VideoCard';
 
-export const revalidate = 15;
+export const dynamic = 'force-dynamic';
 
 export default async function Search({ searchParams }: { searchParams: { q?: string } }) {
   const q = searchParams.q ?? '';

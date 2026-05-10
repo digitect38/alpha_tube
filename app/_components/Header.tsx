@@ -33,14 +33,14 @@ export function Header() {
   return (
     <header className="border-b border-neutral-800 sticky top-0 bg-[#0f0f0f]/95 backdrop-blur z-10">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center gap-4">
-        <Link href="/" className="flex items-center" aria-label="Alpha Tube home">
+        <Link href="/" className="flex items-center shrink-0" aria-label="Alpha Tube home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/apps/alpha_tube/AlphaTube_logo.png"
             alt="Alpha Tube"
             width={1049}
             height={381}
-            className="h-12 w-auto"
+            className="h-12 w-auto m-2"
           />
         </Link>
         <form onSubmit={submitSearch} className="flex-1 max-w-xl">

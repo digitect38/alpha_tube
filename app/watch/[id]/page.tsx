@@ -6,8 +6,9 @@ import { Comments } from '@/app/_components/Comments';
 import { LikeButton } from '@/app/_components/LikeButton';
 import { ShareButton } from '@/app/_components/ShareButton';
 import { ViewTracker } from '@/app/_components/ViewTracker';
+import { ProcessingPoller } from '@/app/_components/ProcessingPoller';
 
-export const revalidate = 15;
+export const dynamic = 'force-dynamic';
 
 export default async function Watch({ params }: { params: { id: string } }) {
   const v = await getVideo(params.id);
@@ -19,9 +20,10 @@ export default async function Watch({ params }: { params: { id: string } }) {
       <div className="max-w-3xl mx-auto py-20 text-center">
         <h1 className="text-xl mb-2">{v.title}</h1>
         <p className="text-neutral-400">
-          {v.status === 'processing' && 'This video is still being processed. Refresh in a moment…'}
+          {v.status === 'processing' && 'This video is still being processed. The page will refresh automatically…'}
           {v.status === 'failed' && 'Processing failed. The uploader will need to re-upload.'}
         </p>
+        {v.status === 'processing' && <ProcessingPoller />}
       </div>
     );
   }

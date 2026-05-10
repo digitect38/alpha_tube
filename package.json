@@ -14,13 +14,17 @@
   "dependencies": {
     "better-sqlite3": "^11.3.0",
     "hls.js": "^1.5.17",
+    "js-yaml": "^4.1.0",
     "next": "14.2.35",
+    "picomatch": "^4.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.7.4",
+    "@types/picomatch": "^3.0.1",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",

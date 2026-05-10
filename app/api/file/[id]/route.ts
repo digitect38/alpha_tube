@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { getDb } from '@/lib/db';
+import { isHidden } from '@/lib/visibility';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,9 +32,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ error: 'bad id' }, { status: 400 });
   }
   const row = getDb()
-    .prepare(`SELECT mp4_path FROM videos WHERE id = ? AND status = 'ready'`)
-    .get(params.id) as { mp4_path: string | null } | undefined;
+    .prepare(`SELECT mp4_path, original_path FROM videos WHERE id = ? AND status = 'ready'`)
+    .get(params.id) as { mp4_path: string | null; original_path: string | null } | undefined;
   if (!row?.mp4_path) return NextResponse.json({ error: 'not found' }, { status: 404 });
+  if (isHidden(params.id, row.original_path)) {
+    return NextResponse.json({ error: 'not found' }, { status: 404 });
+  }
 
   const abs = row.mp4_path;
   let stat: fs.Stats;

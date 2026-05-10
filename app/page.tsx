@@ -1,7 +1,7 @@
 import { listVideos } from '@/lib/queries';
 import { VideoCard } from './_components/VideoCard';
 
-export const revalidate = 15;
+export const dynamic = 'force-dynamic';
 
 const CATEGORIES = ['All', 'General', 'Education', 'Tech', 'Music', 'Gaming', 'Vlog'];
 

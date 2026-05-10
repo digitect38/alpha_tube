@@ -1,0 +1,18 @@
+# Hide videos from all listings AND block direct URL access (returns 404).
+# Each entry is either a 16-char video ID (hex) or a glob path pattern.
+#
+# Patterns match against the video's original_path (the absolute file path
+# at import time). Both full-path and basename-only globs are accepted:
+#   "**/draft/**"          → anything under a "draft" folder
+#   "*.private.mp4"        → any file named *.private.mp4
+#   "/Users/woosj/.../foo.mp4"  → exact path
+#
+# Edits take effect within ~15 seconds (Next.js cache TTL). Restart the
+# container to apply immediately.
+#
+# To enable: copy this file to data/visibility.yml and uncomment entries.
+
+hidden:
+  # - 8351b3faaf6fd88c
+  # - "**/draft/**"
+  # - "*.private.mp4"
