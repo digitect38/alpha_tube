@@ -40,7 +40,7 @@ export function Header() {
             alt="Alpha Tube"
             width={1049}
             height={381}
-            className="h-12 w-auto m-2"
+            className="h-12 w-auto m-1"
           />
         </Link>
         <form onSubmit={submitSearch} className="flex-1 max-w-xl">
