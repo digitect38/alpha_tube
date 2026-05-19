@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 
 type Props = {
@@ -13,6 +13,93 @@ type Props = {
 export function Player({ src, poster, title, artist, artwork }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
   const isHls = src.endsWith('.m3u8');
+
+  // Cast tokens let Chromecast/AirPlay fetch the asset without portal cookies.
+  // Only applied to plain-MP4 routes — HLS would need every segment URL
+  // rewritten to include the token, which is a bigger change. We strip any
+  // existing query, request a token scoped to this videoId, then append it
+  // so <video controls> exposes a cast-ready URL. Chrome's built-in cast
+  // affordance picks it up automatically.
+  const [tokenSrc, setTokenSrc] = useState<string | null>(null);
+  useEffect(() => {
+    if (isHls) return;
+    const m = src.match(/\/api\/file\/([a-f0-9]{16})/);
+    if (!m) return;
+    const vid = m[1];
+    let cancelled = false;
+    fetch(`/cast-token/alpha_tube/${vid}`, { method: 'POST', credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d?.token) return;
+        const sep = src.includes('?') ? '&' : '?';
+        setTokenSrc(`${src}${sep}token=${d.token}`);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [src, isHls]);
+
+  const effectiveSrc = tokenSrc ?? src;
+
+  // Google Cast SDK: load lazily, expose an explicit button. Chrome's built-in
+  // <video controls> cast affordance only shows when its discovery thread
+  // already found a device — failure modes here are silent. An explicit button
+  // also makes the feature visible in non-Chrome chromium builds.
+  const [castReady, setCastReady] = useState(false);
+  const [casting, setCasting] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const w = window as any;
+    if (w.cast?.framework) { setCastReady(true); return; }
+    if (w.__castScriptLoading) return;
+    w.__castScriptLoading = true;
+    w.__onGCastApiAvailable = (available: boolean) => {
+      if (!available) return;
+      const ctx = w.cast.framework.CastContext.getInstance();
+      ctx.setOptions({
+        receiverApplicationId: w.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        autoJoinPolicy: w.chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+      });
+      setCastReady(true);
+    };
+    const s = document.createElement('script');
+    s.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+    s.async = true;
+    document.head.appendChild(s);
+  }, []);
+
+  const startCast = async () => {
+    if (typeof window === 'undefined') return;
+    const w = window as any;
+    if (!w.cast?.framework) return;
+    const ctx = w.cast.framework.CastContext.getInstance();
+    try {
+      // Pop the device picker. Cancel throws — that's a no-op.
+      await ctx.requestSession();
+      const session = ctx.getCurrentSession();
+      if (!session) return;
+      // Cast device fetches the URL itself, so use an absolute origin and
+      // the token-authenticated src.
+      const absoluteSrc = new URL(effectiveSrc, window.location.origin).toString();
+      const mediaInfo = new w.chrome.cast.media.MediaInfo(absoluteSrc, 'video/mp4');
+      const md = new w.chrome.cast.media.GenericMediaMetadata();
+      if (title) md.title = title;
+      if (artist) md.subtitle = artist;
+      if (artwork) md.images = [new w.chrome.cast.Image(new URL(artwork, window.location.origin).toString())];
+      mediaInfo.metadata = md;
+      await session.loadMedia(new w.chrome.cast.media.LoadRequest(mediaInfo));
+      setCasting(true);
+      const stateListener = (ev: any) => {
+        const SESSION_END = w.cast.framework.SessionState.SESSION_ENDED;
+        if (ev.sessionState === SESSION_END) {
+          setCasting(false);
+          ctx.removeEventListener(w.cast.framework.CastContextEventType.SESSION_STATE_CHANGED, stateListener);
+        }
+      };
+      ctx.addEventListener(w.cast.framework.CastContextEventType.SESSION_STATE_CHANGED, stateListener);
+    } catch {
+      /* user cancelled / no device / etc. */
+    }
+  };
 
   // For non-HLS (plain MP4 — what every imported video uses) the src prop on
   // the JSX element is enough; React/SSR handles hydration. We only need an
@@ -150,14 +237,30 @@ export function Player({ src, poster, title, artist, artwork }: Props) {
   }, []);
 
   return (
-    <video
-      ref={ref}
-      src={isHls ? undefined : src}
-      controls
-      poster={poster ?? undefined}
-      className="w-full aspect-video bg-black rounded-lg"
-      playsInline
-      preload="metadata"
-    />
+    <div className="relative">
+      <video
+        ref={ref}
+        src={isHls ? undefined : effectiveSrc}
+        controls
+        poster={poster ?? undefined}
+        className="w-full aspect-video bg-black rounded-lg"
+        playsInline
+        preload="metadata"
+      />
+      {castReady && !isHls && (
+        <button
+          type="button"
+          onClick={startCast}
+          aria-label={casting ? 'Casting' : 'Cast to device'}
+          title={casting ? 'Casting to device' : 'Cast to TV'}
+          className={
+            'absolute right-3 top-3 px-2.5 py-1.5 rounded text-xs font-medium ' +
+            (casting ? 'bg-red-600 text-white' : 'bg-black/60 text-white hover:bg-black/80')
+          }
+        >
+          📺 {casting ? 'Casting' : 'Cast'}
+        </button>
+      )}
+    </div>
   );
 }

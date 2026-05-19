@@ -29,7 +29,7 @@ function fmtAge(ts: number) {
 
 export function VideoCard({ v }: { v: VideoCardData }) {
   return (
-    <Link href={`/watch/${v.id}`} className="group block">
+    <Link href={`/watch/${v.id}`} className="group block cursor-pointer">
       <div className="relative aspect-video bg-neutral-900 rounded-lg overflow-hidden">
         {v.thumbnail ? (
           // eslint-disable-next-line @next/next/no-img-element
