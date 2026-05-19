@@ -254,11 +254,21 @@ export function Player({ src, poster, title, artist, artwork }: Props) {
           aria-label={casting ? 'Casting' : 'Cast to device'}
           title={casting ? 'Casting to device' : 'Cast to TV'}
           className={
-            'absolute right-3 top-3 px-2.5 py-1.5 rounded text-xs font-medium ' +
+            'absolute right-3 top-3 p-1.5 rounded ' +
             (casting ? 'bg-red-600 text-white' : 'bg-black/60 text-white hover:bg-black/80')
           }
         >
-          📺 {casting ? 'Casting' : 'Cast'}
+          {casting ? (
+            // Material "cast_connected" (24×24, currentColor)
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 7v1.63c3.96 1.28 7.09 4.41 8.37 8.37H19V7H5z"/>
+            </svg>
+          ) : (
+            // Material "cast" (24×24, currentColor)
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M21 3H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11z"/>
+            </svg>
+          )}
         </button>
       )}
     </div>
